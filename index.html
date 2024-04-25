@@ -1,0 +1,293 @@
+<html>
+<head>
+<title>simple.ipynb</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #5f5a60; font-style: italic;}
+.s1 { color: #f8f8f8;}
+.s2 { color: #f9ee98;}
+.s3 { color: #8f9d6a;}
+.s4 { color: #cf6a4c;}
+.s5 { color: #cda869;}
+</style>
+</head>
+<body bgcolor="#141414">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+simple.ipynb</font>
+</center></td></tr></table>
+<pre><span class="s0">#%% md 
+</span><span class="s1"># DS220 Final Project by Aarush Bansal 
+</span><span class="s0">#%% md 
+</span><span class="s1">### Analyzing the GDP data of the USA for the past 43 years (till 1980) 
+ 
+Understanding our basic economic standing in the form of gross domestic product is important as it helps us understand how the USA's economy is not only measured, but what weighs into it and by further analyzing the makeup of GDP, we can start to create conclusions about economic growth and increase our understanding of how various monetary vehicles (such as the housing market or the stock market) effect the country as a whole. This is the role of Macro-economists, and by utilizing the data science tools explored in class, we can make their life simpler and display the data in a convenient way that visualizes the necessary data for them to make judgements about the health of the United States economy. 
+ 
+I started the project by going to: https://bea.gov and downloading interactive data 1.1.5 from the Gross Domestic Product tab in tools. From there I edited the data I want to download by changing the range of data from 2020-2023 quarterly to 1980 - 2023 annually. Then I downloaded a csv file that I then had to edit so that the formatting is more pandas friendly by deleting extra lines that were unnecessary. I then started to look at the data through pandas. 
+</span><span class="s0">#%% md 
+</span>
+<span class="s0">#%% md 
+</span><span class="s1">Basic import of the important libraries being utilized in this project. 
+</span><span class="s0">#%% 
+# Import libraries</span>
+<span class="s2">import </span><span class="s1">pandas </span><span class="s2">as </span><span class="s1">pd</span>
+<span class="s2">import </span><span class="s1">matplotlib.pyplot </span><span class="s2">as </span><span class="s1">plt</span>
+<span class="s2">import </span><span class="s1">numpy </span><span class="s2">as </span><span class="s1">np</span>
+<span class="s0">#%% md 
+</span><span class="s1">I download the csv file and start to open it up and make sure all the line counts are equal so that I can properly perform the analysis. 
+I also made sure to convert the first column and row into indexes and headers respectively. 
+</span><span class="s0">#%% 
+# Defining data for the dataframe</span>
+<span class="s1">pd.set_option(</span><span class="s3">'display.max_rows'</span><span class="s1">, </span><span class="s4">28</span><span class="s1">)</span>
+<span class="s1">rawData </span><span class="s5">= </span><span class="s1">pd.read_csv(</span><span class="s3">&quot;DS220FinalData.csv&quot;</span><span class="s1">)</span>
+<span class="s1">rawData.info()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Here is the outline of the data and what it looks like. 
+It breaks down the GDP of the USA per year (column) in subsequent parts such as personal consumption, goods, services, investments, etc. 
+Using this data we will look at how important these factors are in total GDP and analyze where a good portion of our GDP is actually created from. 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData </span><span class="s5">= </span><span class="s1">rawData.set_index(</span><span class="s3">&quot;Category&quot;</span><span class="s1">)</span>
+<span class="s1">rawData.head(</span><span class="s4">28</span><span class="s1">)</span>
+<span class="s0">#%% md 
+</span><span class="s1">Here is the Gross Domestic Product visualized by isolating the first row of the data and creating a graph that displays the growth of GDP from 1980 to 2023. 
+</span><span class="s0">#%% 
+</span><span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.iloc[</span><span class="s4">0</span><span class="s1">]</span>
+<span class="s1">row.plot()</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Here is the data shown as a bar graph to more accurately display each individual year's GDP 
+</span><span class="s0">#%% 
+</span><span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.iloc[</span><span class="s4">0</span><span class="s1">]</span>
+<span class="s1">row.plot(kind </span><span class="s5">=</span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">From this data we can see a gradual upward trend of GDP with the exception of the drop recorded in 2009 after the 2008 financial and housing crises which caused a recession alongside the dip in 2020 caused by the COVID-19 pandemic. 
+</span><span class="s0">#%% 
+</span><span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.iloc[</span><span class="s4">0</span><span class="s1">]</span>
+<span class="s1">row.plot(kind </span><span class="s5">=</span><span class="s3">'bar'</span><span class="s1">, logy </span><span class="s5">= </span><span class="s2">True</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">The new graph is with the resulting y-axis being converted to the logarithmic scale to very slightly linearize the data shown. This removes that exponential shape and makes the data slightly easier to view and work with in terms of change. 
+</span><span class="s0">#%% md 
+</span><span class="s1">### 1) How does Personal Consumption factor into the greater gross Domestic Product? 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">&quot;PCE/GDP percentage&quot;</span><span class="s1">] </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Personal consumption expenditures'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Gross domestic product'</span><span class="s1">]</span>
+<span class="s1">rawData.loc[</span><span class="s3">&quot;PCE/GDP percentage&quot;</span><span class="s1">]</span><span class="s5">*= </span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">&quot;PCE/GDP percentage&quot;</span><span class="s1">])</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">&quot;PCE/GDP percentage&quot;</span><span class="s1">].mean())</span>
+<span class="s0">#%% md 
+</span><span class="s1">Here we found what percentage of gross domestic product is made up of Personal consumption expenditures by dividing a row by another. I then multiplied by 100 to display the data in a percentage format. I also calculated the mean of 65.7%. 
+</span><span class="s0">#%% 
+</span><span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'PCE/GDP percentage'</span><span class="s1">]</span>
+<span class="s1">row.plot()</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% 
+</span><span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'PCE/GDP percentage'</span><span class="s1">]</span>
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Here the data is displayed as a graph shows us something interesting. 
+</span><span class="s0">#%% md 
+</span><span class="s1">It seems that roughly from the 1980 to 2023, households have become richer in comparison to the total GDP of the United States. This means that the total percentage of the gross domestic product being made from household spending has been roughly increasing, from which we can infer that means that households are spending more and by proxy, have more to spend. This metric, shown by the graphs, explains the general state of wealth of the citizens of the United States. The data of personal consumption is also made up of durable goods (houses, factories, and other long term things we buy), Non-durable goods (food, game consoles, and other creature comforts), and services (work from other humans like plumbing or electrical work). 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">&quot;Durable Goods/Personal consumption expenditures&quot;</span><span class="s1">] </span><span class="s5">= </span><span class="s1">(rawData.loc[</span><span class="s3">'Durable goods'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Personal consumption expenditures'</span><span class="s1">])</span>
+<span class="s1">rawData.loc[</span><span class="s3">&quot;Durable Goods/Personal consumption expenditures&quot;</span><span class="s1">]</span><span class="s5">*=</span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">&quot;Durable Goods/Personal consumption expenditures&quot;</span><span class="s1">])</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">&quot;Durable Goods/Personal consumption expenditures&quot;</span><span class="s1">].mean())</span>
+
+<span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Durable Goods/Personal consumption expenditures'</span><span class="s1">]</span>
+<span class="s1">row.plot()</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Here is the percentage of durable goods out of Personal Consumption. The only information this information really shows is the small amount of the gross domestic product is made up of the purchase of durable goods. Meaning not that many people are buying things like houses very commonly which would logically make sense as the average American only lives in one place and very few have the privledge of buying and owning/renting multiple properties at once. 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">&quot;Nondurable Goods/Personal consumption expenditures&quot;</span><span class="s1">] </span><span class="s5">= </span><span class="s1">(rawData.loc[</span><span class="s3">'Nondurable goods'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Personal consumption expenditures'</span><span class="s1">])</span>
+<span class="s1">rawData.loc[</span><span class="s3">&quot;Nondurable Goods/Personal consumption expenditures&quot;</span><span class="s1">]</span><span class="s5">*=</span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">&quot;Nondurable Goods/Personal consumption expenditures&quot;</span><span class="s1">])</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">&quot;Nondurable Goods/Personal consumption expenditures&quot;</span><span class="s1">].mean())</span>
+
+<span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Nondurable Goods/Personal consumption expenditures'</span><span class="s1">]</span>
+<span class="s1">row.plot()</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Here is the percentage of Nondurable goods out of Personal Consumption. This shows that, at least of last year, roughly 23 percent of the gross domestic product is from the consumption of a combination of necessities and luxuries. What is interesting to note is that the percentage of durable goods and nondurable goods in GDP trends downwards even though the percentage personal consumption has an upward trend in regards to how much of GDP is made from personal consumption. 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">&quot;Services/Personal consumption expenditures&quot;</span><span class="s1">] </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Services'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Personal consumption expenditures'</span><span class="s1">]</span>
+<span class="s1">rawData.loc[</span><span class="s3">&quot;Services/Personal consumption expenditures&quot;</span><span class="s1">]</span><span class="s5">*=</span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">&quot;Services/Personal consumption expenditures&quot;</span><span class="s1">])</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">&quot;Services/Personal consumption expenditures&quot;</span><span class="s1">].mean())</span>
+
+<span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Services/Personal consumption expenditures'</span><span class="s1">]</span>
+<span class="s1">row.plot()</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Here is the percentage of services out of Personal Consumption. This graph, unlike both goods, shows an upward trend just like how the percentage of Personal Consumption in gross Domestic Product does. This means that unlike Nondurable and durable goods, services are becoming more and more relevant to the overall GDP of America. This could be reflective of part of the job market as many jobs in the USA are ones that provide a service of some kind to another person or company. 
+</span><span class="s0">#%% md 
+</span><span class="s1">### 2) How does business investment factor into the greater gross Domestic Product? 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">'GDPI/GDP'</span><span class="s1">] </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Gross private domestic investment'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Gross domestic product'</span><span class="s1">]</span>
+<span class="s1">rawData.loc[</span><span class="s3">'GDPI/GDP'</span><span class="s1">]</span><span class="s5">*= </span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'GDPI/GDP'</span><span class="s1">])</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'GDPI/GDP'</span><span class="s1">].mean())</span>
+
+<span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'GDPI/GDP'</span><span class="s1">]</span>
+<span class="s1">row.plot()</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">From the visible data, we can see that business investments addition to the total gross domestic product varies heavily but seems to trend very slightly downward. It seems to be super reliant on depressions/recessions and external economic factors that hit the investment a lot more. This may be due to drops in interest rate making the value of invested capital drop alongside it and can heavily change valuations of various investments 
+</span><span class="s0">#%% md 
+</span><span class="s1">### 3) How much of a change was there throughout housing as an investment vehicle throughout the full time range? 
+</span><span class="s0">#%% 
+</span><span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Residential'</span><span class="s1">]</span>
+<span class="s1">row.plot(kind </span><span class="s5">=</span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Looking at the bar graph displaying the residential investments (housing or rentals) we can see that housing seems to be extremely volatile but the reality was that the massive drop of 2008 was caused do to a reinvestment of defaulting mortgages which lead to a massive crash in the housing market. Other than that massive drop it seems to be that the housing market is slowly increasing over time, and does increase in value. 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">] </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Residential'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Gross domestic product'</span><span class="s1">]</span>
+<span class="s1">rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">]</span><span class="s5">*= </span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">])</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">].mean())</span>
+
+<span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">]</span>
+<span class="s1">print(row.mean())</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+
+
+<span class="s0">#%% md 
+</span><span class="s1">After adjusting for GDP, we can see that housing doesn't keep up as well when compared to the overall growth of GDP as there is a lot larger drops visible describing drops in the housing market when compared to the growth of the greater economy at the time. It also shows that housing is a surprisingly large part of gdp, which is roughly 4.2 percent of total GDP and when you consider the entire value of the USA GDP, is quite a lot. 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">] </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Residential'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Gross domestic product'</span><span class="s1">]</span>
+<span class="s1">rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">]</span><span class="s5">*= </span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">])</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">].mean())</span>
+
+<span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Residential/GDP'</span><span class="s1">]</span>
+<span class="s1">print(row.mean())</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">, logy </span><span class="s5">=  </span><span class="s2">True</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+
+<span class="s0">#%% md 
+</span><span class="s1">By taking the log of the line we can see how drastic the changes are in comparison to the whole range pointing out the volatility of the whole range as described before when compared to GDP.  
+</span><span class="s0">#%% md 
+</span><span class="s1">### 4) What effect do imports and exports have on gross domestic product? 
+</span><span class="s0">#%% md 
+</span>
+<span class="s0">#%% 
+</span><span class="s1">xports </span><span class="s5">= </span><span class="s1">pd.DataFrame({</span><span class="s3">'Exports'</span><span class="s5">:</span><span class="s1">rawData.loc[</span><span class="s3">'Exports'</span><span class="s1">], </span><span class="s3">'Imports'</span><span class="s5">:</span><span class="s1">rawData.loc[</span><span class="s3">'Imports'</span><span class="s1">]})</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Exports'</span><span class="s1">].mean())</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Imports'</span><span class="s1">].mean())</span>
+<span class="s1">xports.plot()</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">xports.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Taking a cursory glance we can see that the exports never catch up to the imports. That means that as of the past 43 years, we have been buying more from overseas than we have been sending out. This further implies that we lose gross domestic product when comparing net export as it is always negative throughout the 43-year range. We can also see the difference is slowly increasing over time at an exponential rate. 
+</span><span class="s0">#%% 
+</span><span class="s1">xports </span><span class="s5">= </span><span class="s1">pd.DataFrame({</span><span class="s3">'Exports'</span><span class="s5">:</span><span class="s1">rawData.loc[</span><span class="s3">'Exports'</span><span class="s1">], </span><span class="s3">'Imports'</span><span class="s5">:</span><span class="s1">rawData.loc[</span><span class="s3">'Imports'</span><span class="s1">]})</span>
+
+<span class="s1">xports.plot(logy </span><span class="s5">= </span><span class="s2">True</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">xports.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">, logy </span><span class="s5">= </span><span class="s2">True</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">By taking the log, we can see the difference more accurately as a line versus the exponential of the unadjusted function due to gross domestic product also being an exponential. 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">'Net Export/GDP'</span><span class="s1">] </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Net exports of goods and services'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Gross domestic product'</span><span class="s1">]</span>
+<span class="s1">rawData.loc[</span><span class="s3">'Net Export/GDP'</span><span class="s1">]</span><span class="s5">*= </span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Net Export/GDP'</span><span class="s1">])</span>
+
+<span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Net Export/GDP'</span><span class="s1">]</span>
+<span class="s1">print(row.mean())</span>
+
+<span class="s1">row.plot()</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+
+<span class="s0">#%% md 
+</span><span class="s1">Here we can actually see a negative effect on our gross domestic product which is much different from the past fields we looked at. Throughout the whole tested range, net exports has actually been more harmful to the national gross domestic product than helpful. 
+</span><span class="s0">#%% md 
+</span><span class="s1">### 5) How much labor do we offshore versus send out? (how much work do we offshore versus how much does the rest of the world offshore from us?) 
+</span><span class="s0">#%% 
+</span><span class="s1">xports </span><span class="s5">= </span><span class="s1">pd.DataFrame({</span><span class="s3">'Export Services'</span><span class="s5">:</span><span class="s1">rawData.loc[</span><span class="s3">'Services2'</span><span class="s1">], </span><span class="s3">'Import Services'</span><span class="s5">:</span><span class="s1">rawData.loc[</span><span class="s3">'Services3'</span><span class="s1">]})</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Services2'</span><span class="s1">].mean())</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Services3'</span><span class="s1">].mean())</span>
+<span class="s1">xports.plot()</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">xports.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Surprisingly, even with the new interest in offshoring many modern technology to developing countries, the USA exports a lot more services than it brings in. This could be due to the relative richness of the country compared to other countries alongside the incredible stability of the US economy (evident from the popularity of the US dollar in most country's government vaults). 
+</span><span class="s0">#%% 
+</span><span class="s1">xports </span><span class="s5">= </span><span class="s1">pd.DataFrame({</span><span class="s3">'Export Services'</span><span class="s5">:</span><span class="s1">rawData.loc[</span><span class="s3">'Services2'</span><span class="s1">], </span><span class="s3">'Import Services'</span><span class="s5">:</span><span class="s1">rawData.loc[</span><span class="s3">'Services3'</span><span class="s1">]})</span>
+
+<span class="s1">xports.plot(logy </span><span class="s5">= </span><span class="s2">True</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">xports.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">, logy </span><span class="s5">= </span><span class="s2">True</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Again, by taking the log we can erase the natural exponential growth rate to more accurately see the differences between the imports and exports. From it we can still see that there is a very clear difference between the export of USA services versus how many services the USA hires from other countries. 
+</span><span class="s0">#%% md 
+</span><span class="s1">### 6) How much of gross domestic product is made up of our government's spending? 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">'Gov Spending/GDP'</span><span class="s1">] </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Government consumption expenditures and gross investment'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Gross domestic product'</span><span class="s1">]</span>
+<span class="s1">rawData.loc[</span><span class="s3">'Gov Spending/GDP'</span><span class="s1">]</span><span class="s5">*= </span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Gov Spending/GDP'</span><span class="s1">])</span>
+
+<span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Gov Spending/GDP'</span><span class="s1">]</span>
+<span class="s1">print(row.mean())</span>
+
+<span class="s1">row.plot()</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">When looking at the visualization, we can draw a simple conclusion that the government tends to spend a pretty consistent amount of the gross domestic product every year. Even with the increasing budget deficit of the USA, the amount we spend out of the GDP tends to hover around 19.3%. 
+</span><span class="s0">#%% 
+</span><span class="s1">rawData.loc[</span><span class="s3">'Defense/Gov Spending'</span><span class="s1">] </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'National defense'</span><span class="s1">]</span><span class="s5">/</span><span class="s1">rawData.loc[</span><span class="s3">'Government consumption expenditures and gross investment'</span><span class="s1">]</span>
+<span class="s1">rawData.loc[</span><span class="s3">'Defense/Gov Spending'</span><span class="s1">]</span><span class="s5">*= </span><span class="s4">100</span>
+<span class="s1">print(rawData.loc[</span><span class="s3">'Defense/Gov Spending'</span><span class="s1">])</span>
+
+<span class="s1">row </span><span class="s5">= </span><span class="s1">rawData.loc[</span><span class="s3">'Defense/Gov Spending'</span><span class="s1">]</span>
+<span class="s1">print(row.mean())</span>
+
+<span class="s1">row.plot()</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">row.plot(logy </span><span class="s5">= </span><span class="s2">True</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+
+<span class="s1">row.plot(kind </span><span class="s5">= </span><span class="s3">'bar'</span><span class="s1">, logy </span><span class="s5">= </span><span class="s2">True</span><span class="s1">)</span>
+<span class="s1">plt.show()</span>
+<span class="s0">#%% md 
+</span><span class="s1">Contrary to popular belief, if we see what percentage of government spending goes toward defense, it is actually going downward instead of the cultural belief of a permanently increasing defense budget. When looking at the data, we can say very clearly that our spending on defense is almost at an all-time low since the 1980s. This means that the percentage we dedicate to national defense is getting smaller every concurrent year with some small exceptions such as the bump after the tragedy of 9/11. 
+</span><span class="s0">#%% md 
+</span><span class="s1">Please look at this data and compare it to your current knowledge of the USA economy. If anything surprised you try to think about and understand why. These graphs are created for the convenience of laymen who usually never approach this data due to its daunting size and I hope that these graphs and insights make it easier for you to understand the greater economic system of gross domestic product. Thank you for reading.</span></pre>
+</body>
+</html>
